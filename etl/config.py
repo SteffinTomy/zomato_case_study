@@ -1,0 +1,5 @@
+DB_USER = "root"
+DB_PASSWORD = "experion@123"
+DB_HOST = "localhost"
+DB_PORT = 3306
+DB_NAME = "zomato_analytics"

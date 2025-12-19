@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# ML models (optional but recommended)
+*.pkl
+
+# VS Code
+.vscode/
+
+# OS files
+Thumbs.db
+.DS_Store
