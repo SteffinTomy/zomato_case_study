@@ -1,6 +1,9 @@
 import os
 import glob
 import pandas as pd
+from logger import get_logger
+logger = get_logger("EXTRACT")
+
 
 def extract_all_csvs(base_path):
     all_files = glob.glob(
@@ -8,13 +11,13 @@ def extract_all_csvs(base_path):
         recursive=True
     )
 
-    print(f"Found {len(all_files)} CSV files")
+    logger.info(f"Found {len(all_files)} CSV files")
 
     dataframes = []
 
     for idx, file in enumerate(all_files, start=1):
         try:
-            print(f"Reading file {idx}: {file}")
+            logger.info(f"Reading file {idx}: {file}")
 
             df = pd.read_csv(
                 file,

@@ -1,35 +1,58 @@
-import os
+import sys
+from pathlib import Path
 from extract import extract_all_csvs
 from transform import transform, explode_cuisines
 from load import load_to_staging
+from config import RAW_DATA_PATH
+from logger import get_logger
 
-BASE_PATH = r"C:\ILP2025_01_SDET_WS_16082025\OJT_CASE_STUDY\zomato_case_study\data\raw"
+logger = get_logger("MAIN")
 
-print("BASE_PATH exists:", os.path.exists(BASE_PATH))
+def main():
+    raw_path = Path(RAW_DATA_PATH)
 
-# --------------------
-# EXTRACT
-# --------------------
-df = extract_all_csvs(BASE_PATH)
+    logger.info(f"Raw data path: {raw_path}")
 
-if df.empty:
-    print("No data extracted. Exiting.")
-    exit(1)
+    if not raw_path.exists():
+        logger.critical(f"Raw data path does not exist: {raw_path}")
+        sys.exit(1)
 
-print(f"Rows extracted: {len(df)}")
+    # --------------------
+    # EXTRACT
+    # --------------------
+    try:
+        df = extract_all_csvs(raw_path)
+        logger.info(f"Rows extracted: {len(df)}")
+    except Exception:
+        logger.critical("Extraction failed", exc_info=True)
+        sys.exit(1)
 
-# --------------------
-# TRANSFORM
-# --------------------
-df = transform(df)
-df = explode_cuisines(df)
+    if df.empty:
+        logger.warning("No data extracted. Exiting ETL.")
+        sys.exit(0)
 
-print(f"Rows after transform: {len(df)}")
+    # --------------------
+    # TRANSFORM
+    # --------------------
+    try:
+        df = transform(df)
+        df = explode_cuisines(df)
+        logger.info(f"Rows after transform: {len(df)}")
+    except Exception:
+        logger.critical("Transformation failed", exc_info=True)
+        sys.exit(1)
 
-# --------------------
-# LOAD
-# --------------------
-load_to_staging(df)
+    # --------------------
+    # LOAD
+    # --------------------
+    try:
+        load_to_staging(df)
+        logger.info(f"Total rows loaded: {len(df)}")
+    except Exception:
+        logger.critical("Load failed", exc_info=True)
+        sys.exit(1)
 
-print("ETL completed successfully")
-print("Total rows loaded:", len(df))
+    logger.info("ETL completed successfully")
+
+if __name__ == "__main__":
+    main()
