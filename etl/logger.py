@@ -1,27 +1,29 @@
 import logging
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
+from config import LOG_DIR
 
 def get_logger(name: str):
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
 
-    # Avoid duplicate handlers
+    # Prevent duplicate handlers
     if logger.handlers:
         return logger
 
-    # Always resolve logs directory relative to project root
-    project_root = Path(__file__).resolve().parent.parent
-    logs_dir = project_root / "logs"
-    logs_dir.mkdir(parents=True, exist_ok=True)
+    # Ensure logs directory exists
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-    log_file = logs_dir / "etl.log"
+    log_file = LOG_DIR / "etl.log"
+
+    # Explicitly create log file if it does not exist
+    if not log_file.exists():
+        log_file.touch()
 
     formatter = logging.Formatter(
         "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
     )
 
-    # File handler
+    # File handler (rotating)
     file_handler = RotatingFileHandler(
         log_file,
         maxBytes=5_000_000,
