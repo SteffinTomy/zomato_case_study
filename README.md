@@ -1,53 +1,61 @@
 Zomato Case Study – End-to-End Data & ML Pipeline
 Overview
 
-This project is an end-to-end Data Engineering, Analytics, and Machine Learning case study built using a real-world restaurant dataset (Zomato).
-It demonstrates how to design and implement a production-ready ETL pipeline, perform exploratory data analysis, build interactive dashboards, and develop a machine learning model for restaurant rating prediction.
+This project is an end-to-end Data Engineering, Analytics, and Machine Learning case study built using a real-world Zomato restaurant dataset.
+It demonstrates how to design a production-ready ETL pipeline, perform analytics using Power BI, and expose a machine learning model through a REST API.
 
-The solution emphasizes:
+The solution focuses on clean architecture, fault tolerance, secure configuration, logging, and real-world usability.
 
-Clean architecture
+Key Features
 
-Fault-tolerant ETL
+Production-ready ETL pipeline (Extract, Transform, Load)
 
-Secure configuration management
+Secure configuration using environment variables
 
-Structured logging
+Structured logging with rotating log files
 
-Reproducibility and maintainability
+Robust error handling and recovery strategies
+
+Interactive Power BI dashboard with KPIs and slicers
+
+Restaurant rating prediction using Machine Learning
+
+Model exposed via FastAPI for real-world usage
 
 Project Structure
 ZOMATO_CASE_STUDY/
 │
 ├── data/
-│   └── raw/                       # Raw city-wise CSV files
+│   └── raw/                         # Raw city-wise CSV files
 │
 ├── etl/
-│   ├── config.py                  # Centralized configuration & env vars
-│   ├── db.py                      # Database connection handler
-│   ├── exceptions.py              # Custom ETL exceptions
-│   ├── extract.py                 # Data extraction logic
-│   ├── transform.py               # Data cleaning & transformation
-│   ├── load.py                    # Load data into MySQL staging tables
-│   ├── logger.py                  # Central logging configuration
-│   └── main.py                    # ETL pipeline entry point
+│   ├── config.py                    # Centralized configuration & env vars
+│   ├── db.py                        # Database connection handler
+│   ├── exceptions.py                # Custom ETL exceptions
+│   ├── extract.py                   # Data extraction logic
+│   ├── transform.py                 # Data cleaning & transformation
+│   ├── load.py                      # Load data into MySQL
+│   ├── logger.py                    # Central logging setup
+│   └── main.py                      # ETL pipeline entry point
 │
 ├── ml/
-│   ├── train_model.py             # Model training & evaluation
-│   ├── predict.py                 # Rating prediction script
-│   ├── rating_model.pkl           # Trained ML model
-│   ├── scaler.pkl                 # Feature scaler
-│   └── feature_columns.pkl        # Feature schema reference
+│   ├── train_model.py               # Model training & evaluation
+│   ├── predict.py                   # Standalone prediction script
+│   ├── app.py                       # FastAPI prediction service
+│   ├── rating_model.pkl             # Trained ML model
+│   ├── scaler.pkl                   # Feature scaler
+│   └── feature_columns.pkl          # Feature schema reference
 │
 ├── powerbi/
 │   └── Zomato_Case_Study_Analysis.pbix
 │
-├── .env                           # Environment variables (not committed)
+├── logs/
+│   └── etl.log                      # Rotating ETL logs
+│
+├── .env                             # Environment variables (not committed)
 ├── .gitignore
 ├── requirements.txt
-├── README.md
-└── logs/
-    └── etl.log                    # Rotating ETL logs
+└── README.md
 
 Tech Stack
 Data Engineering
@@ -72,7 +80,7 @@ Analytics & Visualization
 
 Power BI
 
-Dev & Ops Best Practices
+Dev & Best Practices
 
 Environment variables (.env)
 
@@ -80,12 +88,14 @@ Structured logging (logging, RotatingFileHandler)
 
 Custom exception handling
 
-Configurable paths (no hardcoding)
+Configurable and relative paths (no hardcoding)
+
+REST API using FastAPI
 
 ETL Pipeline Design
 1. Extract
 
-Recursively scans all city folders for CSV files
+Recursively scans city-wise folders for CSV files
 
 Uses | as delimiter
 
@@ -93,7 +103,7 @@ Validates mandatory columns
 
 Handles malformed files gracefully:
 
-Logs error
+Logs errors
 
 Skips corrupted files
 
@@ -105,17 +115,17 @@ Standardizes column names
 
 Converts numeric fields safely
 
-Enforces business rules:
+Applies business rules:
 
 Drops rows with missing restaurant name or rating
 
-Normalizes multi-value cuisine fields using explosion
+Explodes multi-value cuisine fields
 
-Logs data quality actions (rows dropped)
+Logs data quality actions
 
 3. Load
 
-Validates schema before database insertion
+Validates schema before insertion
 
 Loads data into MySQL staging tables
 
@@ -131,7 +141,7 @@ Logs written to:
 
 Console
 
-Rotating file: logs/etl.log
+logs/etl.log (rotating log file)
 
 Custom exceptions:
 
@@ -145,6 +155,92 @@ Clear recovery strategies:
 
 Skip invalid files
 
-Stop pipeline on critical failures
+Fail fast on critical errors
 
 Preserve stack traces for debugging
+
+Power BI Dashboard
+
+Clear dashboard title and subtitle
+
+KPIs:
+
+Total Cities
+
+Total Cuisines
+
+Total Restaurants
+
+High Rated Restaurants
+
+Interactive slicers:
+
+City
+
+Cuisine
+
+Rating Category
+
+Appropriate visuals:
+
+Bar charts for comparisons
+
+Donut charts for distribution
+
+Scatter plot for cost vs rating relationship
+
+Corrected map locations (India-only)
+
+Machine Learning & API
+
+Trained ML model to predict restaurant ratings
+
+Feature engineering and scaling applied
+
+Model exposed using FastAPI
+
+Interactive API documentation available via Swagger UI:
+
+http://127.0.0.1:8000/docs
+
+Sample Prediction Input
+{
+  "price": 500,
+  "votes": 250,
+  "city": "Bengaluru",
+  "region": "Indiranagar",
+  "cuisine": "North Indian",
+  "cuisine_type": "Casual Dining"
+}
+
+How to Run
+1. Set environment variables
+
+Create a .env file:
+
+DB_USER=your_user
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=zomato_analytics
+
+2. Run ETL
+python etl/main.py
+
+3. Train Model
+python ml/train_model.py
+
+4. Start Prediction API
+uvicorn ml.app:app --reload
+
+Outcome
+
+This project demonstrates:
+
+Industry-aligned ETL practices
+
+Secure and maintainable configuration
+
+Real-world analytics and visualization
+
+Practical ML deployment via REST API
