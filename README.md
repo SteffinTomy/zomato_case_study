@@ -49,8 +49,7 @@ ZOMATO_CASE_STUDY/
 ├── powerbi/
 │   └── Zomato_Case_Study_Analysis.pbix
 │
-├── logs/
-│   └── etl.log                      # Rotating ETL logs
+├── etl.log                      # Rotating ETL logs
 │
 ├── .env                             # Environment variables (not committed)
 ├── .gitignore
